@@ -1,0 +1,27 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 4
+
+    paths:
+        - app
+        - routes
+        - database
+        - tests
+
+    excludePaths:
+        - bootstrap
+        - storage
+        - vendor
+
+    bootstrapFiles:
+        - vendor/autoload.php
+
+    ignoreErrors:
+        # Pest / Laravel test helpers
+        - '#Call to an undefined method .*Pest.*#'
+
+    # IMPORTANT for Pest/Laravel test helpers
+    scanFiles:
+        - vendor/laravel/framework/src/Illuminate/Foundation/helpers.php
