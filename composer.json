@@ -53,41 +53,90 @@
             "npm install",
             "npm run build"
         ],
+
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite --kill-others"
         ],
+
+        "quality": [
+            "@lint:fix",
+            "@test:unit",
+            "@test:feature"
+        ],
+
         "lint": [
-            "pint --parallel"
+            "@rector:check",
+            "@phpstan",
+            "@pint:check"
         ],
-        "lint:check": [
-            "pint --parallel --test"
+
+        "lint:fix": [
+            "@rector:fix",
+            "@pint:fix"
         ],
+
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
-            "@test"
-        ],
-        "test": [
-            "@php artisan config:clear --ansi",
-            "@lint:check",
+            "@rector:check",
+            "@phpstan",
+            "@pint:check",
             "@php artisan test"
         ],
+
+        "rector:check": [
+            "vendor/bin/rector process --dry-run"
+        ],
+
+        "rector:fix": [
+            "vendor/bin/rector process"
+        ],
+
+        "phpstan": [
+            "vendor/bin/phpstan analyse --memory-limit=1G"
+        ],
+
+        "pint:fix": [
+            "pint --parallel"
+        ],
+
+        "pint:check": [
+            "pint --parallel --test"
+        ],
+
+        "test:unit": [
+            "php artisan test --testsuite=Unit"
+        ],
+
+        "test:feature": [
+            "php artisan test --testsuite=Feature"
+        ],
+
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@ci:check"
+        ],
+
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
+
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
             "@php artisan boost:update --ansi"
         ],
+
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
+
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
+
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]
