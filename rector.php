@@ -3,16 +3,17 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     // Paths to refactor
     $rectorConfig->paths([
-        __DIR__ . '/app',
-        __DIR__ . '/database',
-        __DIR__ . '/routes',
-        __DIR__ . '/tests',
+        __DIR__.'/app',
+        __DIR__.'/database',
+        __DIR__.'/routes',
+        __DIR__.'/tests',
     ]);
 
     // Safe PHP upgrades (no risky behavioral changes)
@@ -29,6 +30,6 @@ return static function (RectorConfig $rectorConfig): void {
     // Keep this conservative early
     $rectorConfig->skip([
         // avoid risky magic transformations in early stage
-        \Rector\Php74\Rector\Closure\ClosureToArrowFunctionRector::class => true,
+        ClosureToArrowFunctionRector::class => true,
     ]);
 };
