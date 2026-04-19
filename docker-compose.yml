@@ -1,0 +1,45 @@
+name: stocker
+
+volumes:
+  mysql-data: {}
+
+services:
+  app:
+    container_name: stocker-app
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - ./docker/logs:/var/www/html/logs:rw
+      - ./storage/ssh:/var/www/html/storage/ssh:rw
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stocker.rule=Host(`stocker.dev.local.test`)"
+      - "traefik.http.routers.stocker.entrypoints=web"
+      - "traefik.http.services.stocker.loadbalancer.server.port=80"
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM php:8.5-apache
+        COPY docker/setup-dev-container.sh /tmp/setup.sh
+        RUN chmod +x /tmp/setup.sh && /usr/bin/bash /tmp/setup.sh
+    networks:
+      - web
+
+  vite:
+    image: node:20
+    container_name: stocker-vite
+    working_dir: /var/www/html
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    volumes:
+      - ./:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.stocker-vite.rule=Host(`vite.stocker.dev.local.test`)"
+      - "traefik.http.routers.stocker-vite.entrypoints=web"
+      - "traefik.http.services.stocker-vite.loadbalancer.server.port=5173"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
